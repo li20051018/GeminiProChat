@@ -4,12 +4,14 @@ import { generateSignature } from '@/utils/auth'
 import IconClear from './icons/Clear'
 import IconX from './icons/X'
 import Picture from './icons/Picture'
+import IconWord from './icons/Word'
 import MessageItem from './MessageItem'
 import ErrorMessageItem from './ErrorMessageItem'
 import type { ChatMessage, ErrorMessage } from '@/types'
 
 export default () => {
   let inputRef: HTMLTextAreaElement
+  let wordFileRef: HTMLInputElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [currentError, setCurrentError] = createSignal<ErrorMessage>()
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal('')
@@ -211,6 +213,34 @@ export default () => {
     setShowComingSoon(true)
   }
 
+  const handleWordUpload = () => {
+    wordFileRef.click()
+  }
+
+  const handleWordFileChange = async(e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file)
+      return
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const mammoth = await import('mammoth')
+      const result = await mammoth.extractRawText({ arrayBuffer })
+      const text = result.value.trim()
+      if (text) {
+        inputRef.value = inputRef.value
+          ? `${inputRef.value}\n\n[Document: ${file.name}]\n${text}`
+          : `[Document: ${file.name}]\n${text}`
+        inputRef.style.height = 'auto'
+        inputRef.style.height = `${inputRef.scrollHeight}px`
+        inputRef.focus()
+      }
+    } catch (err) {
+      console.error('Failed to read Word document:', err)
+    }
+    // Reset the input so the same file can be uploaded again
+    wordFileRef.value = ''
+  }
+
   return (
     <div my-6>
       {/* beautiful coming soon alert box, position: fixed, screen center, no transparent background, z-index 100*/}
@@ -258,6 +288,16 @@ export default () => {
           <button title="Picture" onClick={handlePictureUpload} class="absolute left-1rem top-50% translate-y-[-50%]">
             <Picture />
           </button>
+          <button title="Upload Word document" aria-label="Upload Word document" onClick={handleWordUpload} class="absolute left-2.5rem top-50% translate-y-[-50%]">
+            <IconWord />
+          </button>
+          <input
+            ref={wordFileRef!}
+            type="file"
+            accept=".docx"
+            class="hidden"
+            onChange={handleWordFileChange}
+          />
           <textarea
             ref={inputRef!}
             onKeyDown={handleKeydown}
