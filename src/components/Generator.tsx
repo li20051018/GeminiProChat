@@ -4,12 +4,14 @@ import { generateSignature } from '@/utils/auth'
 import IconClear from './icons/Clear'
 import IconX from './icons/X'
 import Picture from './icons/Picture'
+import IconWord from './icons/Word'
 import MessageItem from './MessageItem'
 import ErrorMessageItem from './ErrorMessageItem'
 import type { ChatMessage, ErrorMessage } from '@/types'
 
 export default () => {
   let inputRef: HTMLTextAreaElement
+  let wordInputRef: HTMLInputElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [currentError, setCurrentError] = createSignal<ErrorMessage>()
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal('')
@@ -17,6 +19,7 @@ export default () => {
   const [controller, setController] = createSignal<AbortController>(null)
   const [isStick, setStick] = createSignal(false)
   const [showComingSoon, setShowComingSoon] = createSignal(false)
+  const [wordError, setWordError] = createSignal('')
   const maxHistoryMessages = parseInt(import.meta.env.PUBLIC_MAX_HISTORY_MESSAGES || '99')
 
   createEffect(() => (isStick() && smoothToBottom()))
@@ -211,6 +214,38 @@ export default () => {
     setShowComingSoon(true)
   }
 
+  const handleWordUpload = () => {
+    wordInputRef.click()
+  }
+
+  const handleWordFileChange = async(e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file)
+      return
+
+    setWordError('')
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const mammoth = await import('mammoth')
+      const result = await mammoth.extractRawText({ arrayBuffer })
+      const text = result.value.trim()
+      if (!text) {
+        setWordError('The Word document appears to be empty or contains no readable text.')
+        return
+      }
+      inputRef.value = `[Word document: ${file.name}]\n\n${text}`
+      inputRef.style.height = 'auto'
+      inputRef.style.height = `${inputRef.scrollHeight}px`
+      inputRef.focus()
+    } catch (err) {
+      console.error(err)
+      setWordError('Failed to read the Word document. Please make sure it is a valid .docx file.')
+    } finally {
+      // Reset file input so the same file can be re-uploaded if needed
+      wordInputRef.value = ''
+    }
+  }
+
   return (
     <div my-6>
       {/* beautiful coming soon alert box, position: fixed, screen center, no transparent background, z-index 100*/}
@@ -258,6 +293,16 @@ export default () => {
           <button title="Picture" onClick={handlePictureUpload} class="absolute left-1rem top-50% translate-y-[-50%]">
             <Picture />
           </button>
+          <button title="Upload Word Document" aria-label="Upload Word Document" onClick={handleWordUpload} class="absolute left-3rem top-50% translate-y-[-50%]">
+            <IconWord />
+          </button>
+          <input
+            ref={wordInputRef!}
+            type="file"
+            accept=".docx"
+            style={{ display: 'none' }}
+            onChange={handleWordFileChange}
+          />
           <textarea
             ref={inputRef!}
             onKeyDown={handleKeydown}
@@ -278,6 +323,9 @@ export default () => {
             <IconClear />
           </button>
         </div>
+        {wordError() && (
+          <div class="text-red-500 text-sm mt-1 px-4">{wordError()}</div>
+        )}
       </Show>
       {/* <div class="fixed bottom-5 left-5 rounded-md hover:bg-slate/10 w-fit h-fit transition-colors active:scale-90" class:stick-btn-on={isStick()}>
         <div>
