@@ -111,6 +111,20 @@ babaohuang/geminiprochat:latest
     pnpm run dev
    ```
 
+## Obsidian 的 AI 聊天插件
+
+如果你使用 [Obsidian](https://obsidian.md/) 进行笔记管理，并希望在其中集成 AI 聊天能力，以下插件支持连接 **Claude**（Anthropic）及其他 AI 模型：
+
+| 插件 | 说明 | Claude 支持 |
+| --- | --- | --- |
+| [Obsidian Copilot](https://github.com/logancyang/obsidian-copilot) | 支持多种 AI 提供商的 Obsidian Copilot 插件 | ✔（Claude API） |
+| [Smart Connections](https://github.com/brianpetro/obsidian-smart-connections) | 支持多模型的 AI 驱动笔记关联插件 | ✔（Claude API） |
+| [Text Generator](https://github.com/nhaouari/obsidian-textgenerator-plugin) | 使用包括 Claude 在内的多种 AI 提供商生成文本 | ✔（Claude API） |
+| [BMO Chatbot](https://github.com/longy2k/obsidian-bmo-chatbot) | 在 Obsidian 中直接与 AI 模型聊天 | ✔（Claude API） |
+| [Copilot Auto Completion](https://github.com/j0rd1smit/obsidian-copilot-auto-completion) | 使用多种后端实现内联 AI 补全 | ✔（Claude API） |
+
+> **关于 Claude Code：** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 是 Anthropic 推出的智能编码 CLI 工具。目前尚无专门针对 Claude Code 的 Obsidian 插件，但你可以使用上述直接调用 Claude API 的插件在 Obsidian 中获得 Claude 的辅助。对于编程工作流，可以考虑将 Obsidian AI 插件与终端中的 Claude Code 结合使用。
+
 ## 鸣谢
 
 本项目受到以下开源项目的启发，并以其为基础：
