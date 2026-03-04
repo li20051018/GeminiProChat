@@ -97,6 +97,20 @@ You can control the website through environment variables.
     pnpm run dev
    ```
 
+## Obsidian Plugins for AI Chat
+
+If you use [Obsidian](https://obsidian.md/) for note-taking and want AI chat capabilities, the following plugins support connecting to **Claude** (Anthropic) and other AI models:
+
+| Plugin | Description | Claude Support |
+| --- | --- | --- |
+| [Obsidian Copilot](https://github.com/logancyang/obsidian-copilot) | A Copilot in Obsidian that supports multiple AI providers | ✔ (Claude API) |
+| [Smart Connections](https://github.com/brianpetro/obsidian-smart-connections) | AI-powered notes linking with multi-model support | ✔ (Claude API) |
+| [Text Generator](https://github.com/nhaouari/obsidian-textgenerator-plugin) | Generate text using various AI providers including Claude | ✔ (Claude API) |
+| [BMO Chatbot](https://github.com/longy2k/obsidian-bmo-chatbot) | Chat with AI models directly in Obsidian | ✔ (Claude API) |
+| [Copilot Auto Completion](https://github.com/j0rd1smit/obsidian-copilot-auto-completion) | Inline AI completions using various backends | ✔ (Claude API) |
+
+> **Note on Claude Code:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is Anthropic's agentic coding CLI tool. While there is no dedicated Obsidian plugin for Claude Code at this time, you can use the plugins above (which call the Claude API directly) to get Claude-powered assistance inside Obsidian. For coding workflows, consider combining an Obsidian AI plugin with Claude Code in your terminal.
+
 ## Acknowledgements
 
 This project is inspired by and based on the following open-source project:
