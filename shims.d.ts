@@ -14,3 +14,18 @@ declare global {
     interface HTMLAttributes<> extends AttributifyAttributes {}
   }
 }
+
+declare module 'mammoth/mammoth.browser' {
+  interface ConversionResult {
+    value: string
+    messages: unknown[]
+  }
+  interface MammothOptions {
+    arrayBuffer: ArrayBuffer
+  }
+  const mammoth: {
+    extractRawText(options: MammothOptions): Promise<ConversionResult>
+    convertToHtml(options: MammothOptions): Promise<ConversionResult>
+  }
+  export default mammoth
+}

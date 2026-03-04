@@ -4,12 +4,14 @@ import { generateSignature } from '@/utils/auth'
 import IconClear from './icons/Clear'
 import IconX from './icons/X'
 import Picture from './icons/Picture'
+import Word from './icons/Word'
 import MessageItem from './MessageItem'
 import ErrorMessageItem from './ErrorMessageItem'
 import type { ChatMessage, ErrorMessage } from '@/types'
 
 export default () => {
   let inputRef: HTMLTextAreaElement
+  let wordInputRef: HTMLInputElement
   const [messageList, setMessageList] = createSignal<ChatMessage[]>([])
   const [currentError, setCurrentError] = createSignal<ErrorMessage>()
   const [currentAssistantMessage, setCurrentAssistantMessage] = createSignal('')
@@ -211,9 +213,38 @@ export default () => {
     setShowComingSoon(true)
   }
 
+  const handleWordUpload = () => {
+    wordInputRef.click()
+  }
+
+  const handleWordFileChange = async(e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file)
+      return
+    const input = e.target as HTMLInputElement
+    input.value = ''
+
+    try {
+      const mammoth = (await import('mammoth/mammoth.browser')).default
+      const arrayBuffer = await file.arrayBuffer()
+      const result = await mammoth.extractRawText({ arrayBuffer })
+      const text = result.value.trim()
+      if (!text)
+        return
+
+      const docMessage = `[Document: ${file.name}]\n${text}`
+      inputRef.value = docMessage
+      inputRef.style.height = 'auto'
+      inputRef.style.height = `${inputRef.scrollHeight}px`
+      inputRef.focus()
+    } catch (err) {
+      console.error('Failed to read Word document:', err)
+    }
+  }
+
   return (
     <div my-6>
-      {/* beautiful coming soon alert box, position: fixed, screen center, no transparent background, z-index 100*/}
+      {/* beautiful coming soon alert box, position: fixed, screen center, no transparent background, z-index 100 */}
       <Show when={showComingSoon()}>
         <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100">
           <div class="bg-white rounded-md shadow-md p-6">
@@ -258,6 +289,16 @@ export default () => {
           <button title="Picture" onClick={handlePictureUpload} class="absolute left-1rem top-50% translate-y-[-50%]">
             <Picture />
           </button>
+          <button title="Upload Word Document" onClick={handleWordUpload} class="absolute left-3rem top-50% translate-y-[-50%]">
+            <Word />
+          </button>
+          <input
+            ref={wordInputRef!}
+            type="file"
+            accept=".docx"
+            style={{ display: 'none' }}
+            onChange={handleWordFileChange}
+          />
           <textarea
             ref={inputRef!}
             onKeyDown={handleKeydown}
