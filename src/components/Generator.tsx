@@ -6,6 +6,7 @@ import IconX from './icons/X'
 import Picture from './icons/Picture'
 import MessageItem from './MessageItem'
 import ErrorMessageItem from './ErrorMessageItem'
+import SystemRoleSettings from './SystemRoleSettings'
 import type { ChatMessage, ErrorMessage } from '@/types'
 
 export default () => {
@@ -17,6 +18,9 @@ export default () => {
   const [controller, setController] = createSignal<AbortController>(null)
   const [isStick, setStick] = createSignal(false)
   const [showComingSoon, setShowComingSoon] = createSignal(false)
+  const [systemRoleEditing, setSystemRoleEditing] = createSignal(false)
+  const [currentSystemRoleSettings, setCurrentSystemRoleSettings] = createSignal('')
+  const [temperature, setTemperature] = createSignal(0.6)
   const maxHistoryMessages = parseInt(import.meta.env.PUBLIC_MAX_HISTORY_MESSAGES || '99')
 
   createEffect(() => (isStick() && smoothToBottom()))
@@ -36,6 +40,11 @@ export default () => {
 
       if (localStorage.getItem('stickToBottom') === 'stick')
         setStick(true)
+
+      if (localStorage.getItem('systemRoleSettings')) {
+        const savedSystemRole = localStorage.getItem('systemRoleSettings')
+        setCurrentSystemRoleSettings(savedSystemRole)
+      }
     } catch (err) {
       console.error(err)
     }
@@ -48,6 +57,7 @@ export default () => {
 
   const handleBeforeUnload = () => {
     localStorage.setItem('messageList', JSON.stringify(messageList()))
+    localStorage.setItem('systemRoleSettings', currentSystemRoleSettings())
     isStick() ? localStorage.setItem('stickToBottom', 'stick') : localStorage.removeItem('stickToBottom')
   }
 
@@ -111,6 +121,8 @@ export default () => {
             t: timestamp,
             m: requestMessageList?.[requestMessageList.length - 1]?.parts[0]?.text || '',
           }),
+          systemInstruction: currentSystemRoleSettings() || undefined,
+          temperature: temperature(),
         }),
         signal: controller.signal,
       })
@@ -227,6 +239,15 @@ export default () => {
           </div>
         </div>
       </Show>
+
+      <SystemRoleSettings
+        canEdit={() => !loading()}
+        systemRoleEditing={systemRoleEditing}
+        setSystemRoleEditing={setSystemRoleEditing}
+        currentSystemRoleSettings={currentSystemRoleSettings}
+        setCurrentSystemRoleSettings={setCurrentSystemRoleSettings}
+        temperatureSetting={setTemperature}
+      />
 
       <Index each={messageList()}>
         {(message, index) => (
