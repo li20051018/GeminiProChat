@@ -228,6 +228,30 @@ export default () => {
         </div>
       </Show>
 
+      <Show when={messageList().length === 0 && !currentAssistantMessage()}>
+        <div class="flex flex-col items-center justify-center py-12 gap-4 op-80">
+          <h2 class="text-2xl font-bold">👋 Hello!</h2>
+          <p class="text-center max-w-sm">
+            Welcome to <span class="font-semibold">Gemini Pro Chat</span>. Ask me anything to get started.
+          </p>
+          <div class="flex flex-wrap gap-2 justify-center mt-2">
+            {(['What can you do?', 'Tell me a joke', 'Explain quantum computing'] as const).map(prompt => (
+              <button
+                key={prompt}
+                class="px-3 py-1.5 rounded-full border border-slate/30 text-sm hover:bg-slate/10 transition-colors"
+                onClick={() => {
+                  inputRef.value = prompt
+                  inputRef.dispatchEvent(new Event('input'))
+                  inputRef.focus()
+                }}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Show>
+
       <Index each={messageList()}>
         {(message, index) => (
           <MessageItem
